@@ -48,46 +48,40 @@ document.addEventListener('DOMContentLoaded', function() {
             const xmlDoc = parser.parseFromString(content, 'text/xml');
             const title = xmlDoc.getElementsByTagName('title')[0]?.textContent || 'No Title';
             const body = xmlDoc.getElementsByTagName('body')[0];
-            const formattedContent = formatDitaContent(body);
-            contentDiv.innerHTML = `<h2>${title}</h2>${formattedContent}`;
+            contentDiv.innerHTML = `<h2>${title}</h2>${parseDITAContent(body)}`;
         } else {
             contentDiv.innerHTML = content;
         }
     }
 
-    function formatDitaContent(body) {
-        let formattedContent = '';
-        if (body) {
-            const children = body.children;
-            for (let i = 0; i < children.length; i++) {
-                const child = children[i];
+    function parseDITAContent(node) {
+        if (!node) return '';
+        let htmlContent = '';
+        node.childNodes.forEach(child => {
+            if (child.nodeType === Node.ELEMENT_NODE) {
                 switch (child.tagName.toLowerCase()) {
                     case 'p':
-                        formattedContent += `<p>${child.textContent}</p>`;
-                        break;
-                    case 'section':
-                        formattedContent += `<section>${formatDitaContent(child)}</section>`;
+                        htmlContent += `<p>${child.innerHTML}</p>`;
                         break;
                     case 'ul':
-                        formattedContent += `<ul>${formatDitaContent(child)}</ul>`;
+                        htmlContent += `<ul>${parseDITAContent(child)}</ul>`;
                         break;
                     case 'li':
-                        formattedContent += `<li>${child.textContent}</li>`;
+                        htmlContent += `<li>${child.innerHTML}</li>`;
                         break;
                     case 'b':
-                        formattedContent += `<b>${child.textContent}</b>`;
+                        htmlContent += `<b>${child.innerHTML}</b>`;
                         break;
-                    case 'i':
-                        formattedContent += `<i>${child.textContent}</i>`;
+                    case 'title':
+                        htmlContent += `<h2>${child.innerHTML}</h2>`;
                         break;
-                    // Add more cases as needed for other DITA elements
                     default:
-                        formattedContent += child.outerHTML;
+                        htmlContent += parseDITAContent(child);
                         break;
                 }
             }
-        }
-        return formattedContent;
+        });
+        return htmlContent;
     }
 
     function convertFileContent(content, type) {
