@@ -61,24 +61,27 @@ document.addEventListener('DOMContentLoaded', function() {
             if (child.nodeType === Node.ELEMENT_NODE) {
                 switch (child.tagName.toLowerCase()) {
                     case 'p':
-                        htmlContent += `<p>${child.innerHTML}</p>`;
+                        htmlContent += `<p>${parseDITAContent(child)}</p>`;
                         break;
                     case 'ul':
                         htmlContent += `<ul>${parseDITAContent(child)}</ul>`;
                         break;
                     case 'li':
-                        htmlContent += `<li>${child.innerHTML}</li>`;
+                        htmlContent += `<li>${parseDITAContent(child)}</li>`;
                         break;
                     case 'b':
-                        htmlContent += `<b>${child.innerHTML}</b>`;
+                    case 'uicontrol':
+                        htmlContent += `<b>${parseDITAContent(child)}</b>`;
                         break;
                     case 'title':
-                        htmlContent += `<h2>${child.innerHTML}</h2>`;
+                        htmlContent += `<h2>${parseDITAContent(child)}</h2>`;
                         break;
                     default:
                         htmlContent += parseDITAContent(child);
                         break;
                 }
+            } else if (child.nodeType === Node.TEXT_NODE) {
+                htmlContent += child.textContent;
             }
         });
         return htmlContent;
